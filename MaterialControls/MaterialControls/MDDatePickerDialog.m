@@ -28,10 +28,12 @@
 #import "MDDeviceHelper.h"
 #import "MDCalendar.h"
 #import "MDCalendarDateHeader.h"
+#import "NSCalendarHelper.h"
 
 #define kCalendarHeaderHeight                                                  \
   (([[UIScreen mainScreen] bounds].size.width > 320) ? 190 : 160)
 #define kCalendarActionBarHeight 50
+#define kDefaultLocale @"en"
 
 @interface MDDatePickerDialog ()
 @property(strong, nonatomic) UIFont *buttonFont UI_APPEARANCE_SELECTOR;
@@ -53,66 +55,88 @@
 - (instancetype)init {
   self = [super init];
   if (self) {
+    self.localeStr = kDefaultLocale;
+    [self setupContent];
+  }
+  return self;
+}
+
+- (instancetype)initWithLocale:(NSString*)locale {
+    self = [super init];
+    if (self) {
+        self.localeStr = locale;
+        [self setupContent];
+    }
+    return self;
+}
+
+- (void)setupContent {
     UIView *view = [MDDeviceHelper getMainView];
     [self setFrame:view.bounds];
-
+    
     popupHolder = [[UIView alloc] init];
     popupHolder.layer.shadowOpacity = 0.5;
     popupHolder.layer.shadowRadius = 8;
     popupHolder.layer.shadowColor = [[UIColor blackColor] CGColor];
     popupHolder.layer.shadowOffset = CGSizeMake(0, 2.5);
-
+    
     int vSpacing = view.bounds.size.height * 0.05;
     int hSpacing = view.bounds.size.width * 0.1;
-
+    
     [popupHolder
-        setFrame:CGRectMake(hSpacing, vSpacing, self.mdWidth - 2 * hSpacing,
-                            self.mdHeight - 2 * vSpacing)];
-
+     setFrame:CGRectMake(hSpacing, vSpacing, self.mdWidth - 2 * hSpacing,
+                         self.mdHeight - 2 * vSpacing)];
+    
+    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:_localeStr];
+    self.dateFormatter.locale = locale;
+    
+    [[NSCalendarHelper mdSharedCalendar] setLocale:locale];
+    
     _header = [[MDCalendarDateHeader alloc]
-        initWithFrame:CGRectMake(0, 0, popupHolder.mdWidth,
-                                 kCalendarHeaderHeight)];
+               initWithFrame:CGRectMake(0, 0, popupHolder.mdWidth,
+                                        kCalendarHeaderHeight)];
+    _header.dateFormatter.locale = locale;
     [popupHolder addSubview:_header];
-
+    
     MDCalendar *calendar = [[MDCalendar alloc]
-        initWithFrame:CGRectMake(0, kCalendarHeaderHeight, popupHolder.mdWidth,
-                                 popupHolder.mdHeight - kCalendarHeaderHeight -
-                                     kCalendarActionBarHeight)];
+                            initWithFrame:CGRectMake(0, kCalendarHeaderHeight, popupHolder.mdWidth,
+                                                     popupHolder.mdHeight - kCalendarHeaderHeight -
+                                                     kCalendarActionBarHeight)];
     calendar.dateHeader = _header;
     [popupHolder addSubview:calendar];
     self.calendar = calendar;
     self.calendar.theme = MDCalendarThemeLight;
-
+    
     [self setBackgroundColor:self.calendar.backgroundColor];
-
-    _buttonFont = [UIFontHelper robotoFontWithName:@"roboto-bold" size:15];
-
+    
+    _buttonFont = [UIFontHelper robotoFontWithName:@"roboto-bold" size:16];
+    
     MDButton *buttonOk = [[MDButton alloc]
-        initWithFrame:CGRectMake(
-                          popupHolder.mdWidth - 2 * kCalendarActionBarHeight,
-                          popupHolder.mdHeight - kCalendarActionBarHeight,
-                          2 * kCalendarActionBarHeight * 3.0 / 4.0,
-                          kCalendarActionBarHeight * 3.0 / 4.0)
-                 type:MDButtonTypeFlat
-          rippleColor:nil];
-      
-      
+                          initWithFrame:CGRectMake(
+                                                   popupHolder.mdWidth - 1.5 * kCalendarActionBarHeight,
+                                                   popupHolder.mdHeight - kCalendarActionBarHeight,
+                                                   1.5 * kCalendarActionBarHeight * 3.0 / 4.0,
+                                                   kCalendarActionBarHeight * 3.0 / 4.0)
+                          type:MDButtonTypeFlat
+                          rippleColor:nil];
+    
+    
     [buttonOk setTitleColor:[UIColor blueColor] forState:normal];
     [buttonOk addTarget:self
-                  action:@selector(didSelected)
-        forControlEvents:UIControlEventTouchUpInside];
+                 action:@selector(didSelected)
+       forControlEvents:UIControlEventTouchUpInside];
     [buttonOk.titleLabel setFont:_buttonFont];
     [popupHolder addSubview:buttonOk];
     self.buttonOk = buttonOk;
-
+    
     MDButton *buttonCancel = [[MDButton alloc]
-        initWithFrame:CGRectMake(
-                          popupHolder.mdWidth - 4 * kCalendarActionBarHeight,
-                          popupHolder.mdHeight - kCalendarActionBarHeight,
-                          2 * kCalendarActionBarHeight * 3.0 / 4.0,
-                          kCalendarActionBarHeight * 3.0 / 4.0)
-                 type:MDButtonTypeFlat
-          rippleColor:nil];
+                              initWithFrame:CGRectMake(
+                                                       popupHolder.mdWidth - 4 * kCalendarActionBarHeight,
+                                                       popupHolder.mdHeight - kCalendarActionBarHeight,
+                                                       2.5 * kCalendarActionBarHeight * 3.0 / 4.0,
+                                                       kCalendarActionBarHeight * 3.0 / 4.0)
+                              type:MDButtonTypeFlat
+                              rippleColor:nil];
     [buttonCancel setTitleColor:[UIColor blueColor] forState:normal];
     [buttonCancel addTarget:self
                      action:@selector(didCancelled)
@@ -120,30 +144,29 @@
     [buttonCancel.titleLabel setFont:_buttonFont];
     [popupHolder addSubview:buttonCancel];
     self.buttonCancel = buttonCancel;
-
+    
     [self setTitleOk:@"OK" andTitleCancel:@"CANCEL"];
-      
+    
     [self.buttonCancel
-        setTitleColor:self.calendar.titleColors[@(MDCalendarCellStateButton)]
-             forState:UIControlStateNormal];
+     setTitleColor:self.calendar.titleColors[@(MDCalendarCellStateToday)]
+     forState:UIControlStateNormal];
     [self.buttonOk
-        setTitleColor:self.calendar.titleColors[@(MDCalendarCellStateButton)]
-             forState:UIControlStateNormal];
+     setTitleColor:self.calendar.titleColors[@(MDCalendarCellStateToday)]
+     forState:UIControlStateNormal];
     [self addTarget:self
-                  action:@selector(btnClick:)
-        forControlEvents:UIControlEventTouchUpInside];
-
+             action:@selector(btnClick:)
+   forControlEvents:UIControlEventTouchUpInside];
+    
     [self
-        setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.5]];
-
+     setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.5]];
+    
     [self addSubview:popupHolder];
     [[NSNotificationCenter defaultCenter]
-        addObserver:self
-           selector:@selector(deviceOrientationDidChange:)
-               name:UIDeviceOrientationDidChangeNotification
-             object:nil];
-  }
-  return self;
+     addObserver:self
+     selector:@selector(deviceOrientationDidChange:)
+     name:UIDeviceOrientationDidChangeNotification
+     object:nil];
+
 }
 
 -(NSDate*)selectedDate;
@@ -230,9 +253,9 @@
     break;
   }
 
-  _buttonCancel.mdLeft = popupHolder.mdWidth - 4 * kCalendarActionBarHeight;
+  _buttonCancel.mdLeft = popupHolder.mdWidth - 3.5 * kCalendarActionBarHeight;
   _buttonCancel.mdTop = popupHolder.mdHeight - kCalendarActionBarHeight;
-  _buttonOk.mdLeft = popupHolder.mdWidth - 2 * kCalendarActionBarHeight;
+  _buttonOk.mdLeft = popupHolder.mdWidth - 1.5 * kCalendarActionBarHeight;
   _buttonOk.mdTop = popupHolder.mdHeight - kCalendarActionBarHeight;
 
   [popupHolder setBackgroundColor:_calendar.backgroundColor];

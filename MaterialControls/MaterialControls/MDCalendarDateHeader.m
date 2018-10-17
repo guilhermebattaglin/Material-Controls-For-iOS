@@ -226,7 +226,7 @@
   }
 
   _dateFormatter.dateFormat = @"EEEE";
-  _labelDayName.text = [_dateFormatter stringFromDate:date];
+  _labelDayName.text = [[_dateFormatter stringFromDate:date] capitalizedString];
 
   _dateFormatter.dateFormat = @"MM";
   NSString *monthName = @"";

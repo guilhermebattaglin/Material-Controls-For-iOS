@@ -54,11 +54,13 @@
     dateComponents.day = 5;
     NSDate *date = [[NSCalendar currentCalendar] dateFromComponents:dateComponents];
       
-    MDDatePickerDialog *datePicker = [[MDDatePickerDialog alloc] init];
+    MDDatePickerDialog *datePicker = [[MDDatePickerDialog alloc] initWithLocale:@"pt_BR"];
     _datePicker = datePicker;
     _datePicker.minimumDate = date;
+    _datePicker.maximumDate = [NSDate date];
     _datePicker.selectedDate = date;
     _datePicker.delegate = self;
+    [_datePicker setTitleOk:@"OK" andTitleCancel:@"CANCELAR"];
   }
   [_datePicker show];
 }

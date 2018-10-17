@@ -30,11 +30,14 @@
 @property(weak, nonatomic) IBOutlet id<MDCalendarDelegate> delegate;
 @property (nonnull, strong, nonatomic) NSDate *minimumDate;
 @property (nullable, strong, nonatomic) NSDate *maximumDate;
+@property (nonnull, strong, nonatomic) NSString *localeStr;
 
 - (void) setCalendarHeaderBackgroundColor:(UIColor*)color;
 - (void) setCalendarHeaderDayLabelBackgroundColor:(UIColor*)color;
 - (void) setPickedDayColor:(UIColor*)color;
 - (void) setSelectedDate:(NSDate*)date;
+- (instancetype)initWithFrame:(CGRect)frame andLocale:(NSString*)locale;
+
 @end
 
 #endif

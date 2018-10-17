@@ -102,10 +102,8 @@
   _theme = -1;
   _isDoingLayoutSubview = NO;
 
-  _weekdays =
-      [[NSCalendarHelper mdSharedCalendar] shortStandaloneWeekdaySymbols];
-
-  _firstWeekday = [[NSCalendarHelper mdSharedCalendar] firstWeekday];
+  _weekdays = [[NSCalendarHelper mdSharedCalendar] veryShortStandaloneWeekdaySymbols];
+  _firstWeekday = 1;
 
   UICollectionViewFlowLayout *collectionViewFlowLayout =
       [[UICollectionViewFlowLayout alloc] init];
@@ -324,9 +322,9 @@
     }
     // titleLabel.mdWidth = self.mdWidth;
     _dateHeader.dateFormatter.dateFormat = @"MMMM yyyy";
-    titleLabel.text = [_dateHeader.dateFormatter
-        stringFromDate:[self.minimumDate
-                           mdDateByAddingMonths:indexPath.section]];
+      titleLabel.text = [[_dateHeader.dateFormatter
+                          stringFromDate:[self.minimumDate
+                                          mdDateByAddingMonths:indexPath.section]] capitalizedString];
 
     return cell;
   } else if (indexPath.item >= 7 && indexPath.item <= 13) {
@@ -461,20 +459,25 @@
 }
 
 - (void)setSelectedDate:(NSDate *)selectedDate {
-  NSIndexPath *selectedIndexPath = [self indexPathForDate:selectedDate];
-  if (![_selectedDate mdIsEqualToDateForDay:selectedDate] && ([selectedDate compare:_maximumDate] == NSOrderedSame || [selectedDate compare:_maximumDate] == NSOrderedDescending)) {
-    NSIndexPath *currentIndex =
-        [_collectionView indexPathsForSelectedItems].lastObject;
+  if (![_selectedDate mdIsEqualToDateForDay:selectedDate] && [selectedDate compare:_maximumDate] != NSOrderedDescending) {
+    NSIndexPath *selectedIndexPath = [self indexPathForDate:selectedDate];
+    NSIndexPath *currentIndex = [_collectionView indexPathsForSelectedItems].lastObject;
     [_collectionView deselectItemAtIndexPath:currentIndex animated:NO];
-    [self collectionView:_collectionView
-        didDeselectItemAtIndexPath:currentIndex];
-    [_collectionView selectItemAtIndexPath:selectedIndexPath
-                                  animated:NO
-                            scrollPosition:UICollectionViewScrollPositionNone];
+    [self collectionView:_collectionView didDeselectItemAtIndexPath:currentIndex];
+    [_collectionView selectItemAtIndexPath:selectedIndexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
     [self scrollToDate:selectedDate];
-    [self collectionView:_collectionView
-        didSelectItemAtIndexPath:selectedIndexPath];
+    [self collectionView:_collectionView didSelectItemAtIndexPath:selectedIndexPath];
     _currentMonth = _selectedDate;
+  } else if ([selectedDate compare:_maximumDate] == NSOrderedDescending){
+      NSDate *date = [NSDate date];
+      NSIndexPath *selectedIndexPath = [self indexPathForDate:date];
+      NSIndexPath *currentIndex = [_collectionView indexPathsForSelectedItems].lastObject;
+      [_collectionView deselectItemAtIndexPath:currentIndex animated:NO];
+      [self collectionView:_collectionView didDeselectItemAtIndexPath:currentIndex];
+      [_collectionView selectItemAtIndexPath:selectedIndexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
+      [self scrollToDate:date];
+      [self collectionView:_collectionView didSelectItemAtIndexPath:selectedIndexPath];
+      _currentMonth = _selectedDate;
   }
 }
 

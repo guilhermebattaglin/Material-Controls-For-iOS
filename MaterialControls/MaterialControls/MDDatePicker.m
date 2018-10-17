@@ -24,8 +24,10 @@
 #import "MDDatePicker.h"
 #import "UIView+MDExtension.h"
 #import "MDCalendarDateHeader.h"
+#import "NSCalendarHelper.h"
 
 #define kHeaderHeight 190
+#define kDefaultLocale @"en"
 
 @interface MDDatePicker ()
 @property(nonatomic) MDCalendarDateHeader *header;
@@ -37,14 +39,25 @@
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
+    self.localeStr = kDefaultLocale;
     [self setupContent];
   }
   return self;
 }
 
+- (instancetype)initWithFrame:(CGRect)frame andLocale:(NSString*)locale {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.localeStr = locale;
+        [self setupContent];
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
   self = [super initWithCoder:aDecoder];
   if (self) {
+    self.localeStr = kDefaultLocale;
     [self setupContent];
   }
   return self;
@@ -93,6 +106,21 @@
 
 - (void)setMaximumDate:(NSDate *)maximumDate {
     self.calendar.maximumDate = maximumDate;
+}
+
+-(NSString*)localeStr
+{
+    return self.localeStr;
+}
+
+-(void)setLocaleStr:(NSString *)localeStr
+{
+    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:localeStr];
+    
+    if (locale != nil) {
+        self.header.dateFormatter.locale = locale;
+        [[NSCalendarHelper mdSharedCalendar] setLocale:locale];
+    }
 }
 
 - (void) setSelectedDate:(NSDate*)date {

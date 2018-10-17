@@ -33,6 +33,7 @@
 @class MDButton;
 @interface MDDatePickerDialog : UIControl
 
+@property (nonnull, strong, nonatomic) NSString *localeStr;
 @property (nullable, strong, nonatomic) NSDate *selectedDate;
 @property (nonnull, strong, nonatomic) NSDate *minimumDate;
 @property (nullable, strong, nonatomic) NSDate *maximumDate;
@@ -40,5 +41,7 @@
 
 - (void)show;
 - (void)setTitleOk: (nonnull NSString *) okTitle andTitleCancel: (nonnull NSString *) cancelTitle;
+- (instancetype)initWithLocale:(NSString*)locale;
+
 @end
 #endif
