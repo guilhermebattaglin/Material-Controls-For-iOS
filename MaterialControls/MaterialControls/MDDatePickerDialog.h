@@ -24,9 +24,11 @@
 #define iOSUILib_MDDatePickerDialog_h
 #import <UIKit/UIKit.h>
 
+@class MDDatePickerDialog;
+
 @protocol MDDatePickerDialogDelegate <NSObject>
 
-- (void)datePickerDialogDidSelectDate:(nonnull NSDate *)date;
+- (void)datePickerDialog:(nonnull MDDatePickerDialog *)picker didSelectDate:(nonnull NSDate *)date;
 
 @end
 

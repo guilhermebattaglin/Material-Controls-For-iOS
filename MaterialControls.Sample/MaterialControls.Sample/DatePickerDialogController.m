@@ -68,7 +68,7 @@
  #pragma mark - Navigation
 */
 
-- (void)datePickerDialogDidSelectDate:(NSDate *)date {
+- (void)datePickerDialog:(MDDatePickerDialog *)picker didSelectDate:(NSDate *)date {
   _dateFormatter.dateFormat = @"dd-MM-yyyy";
   _txtDate.text = [_dateFormatter stringFromDate:date];
 }

@@ -273,8 +273,8 @@
 - (void)didSelected {
   if (_delegate &&
       [_delegate
-          respondsToSelector:@selector(datePickerDialogDidSelectDate:)]) {
-    [_delegate datePickerDialogDidSelectDate:_calendar.selectedDate];
+          respondsToSelector:@selector(datePickerDialog:didSelectDate:)]) {
+    [_delegate datePickerDialog:self didSelectDate:_calendar.selectedDate];
   }
   self.hidden = YES;
 }
