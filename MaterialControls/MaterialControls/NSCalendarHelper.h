@@ -25,6 +25,6 @@
 @interface NSCalendarHelper : NSObject
 
 + (nonnull NSCalendar *)mdSharedCalendar;
-- (void)setLocale:(NSString *)locale;
+- (void)setLocaleIdentifier:(NSString *)localeId;
 
 @end
