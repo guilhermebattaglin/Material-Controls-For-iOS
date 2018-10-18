@@ -78,6 +78,15 @@
 
 #pragma mark - Life Cycle && Initialize
 
+- (instancetype)initWithFrame:(CGRect)frame andLocale:(NSLocale *)locale {
+    self = [super initWithFrame:frame];
+    if (self) {
+        [[NSCalendarHelper mdSharedCalendar] setLocale:locale];
+        [self initialize];
+    }
+    return self;
+}
+
 - (instancetype)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {

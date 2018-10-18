@@ -74,5 +74,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData;
 - (void)overrideSelectedCellColor:(UIColor*) color;
 - (void)setSelectedDate:(NSDate *)selectedDate;
+- (instancetype)initWithFrame:(CGRect)frame andLocale:(NSLocale *)locale;
 @end
 NS_ASSUME_NONNULL_END
