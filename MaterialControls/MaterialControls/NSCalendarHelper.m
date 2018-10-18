@@ -33,4 +33,9 @@
   return instance;
 }
 
+- (void)setLocale:(NSString *)locale {
+    NSLocale *local = [[NSLocale alloc] initWithLocaleIdentifier:locale];
+    [[NSCalendarHelper mdSharedCalendar] setLocale:local];
+}
+
 @end
